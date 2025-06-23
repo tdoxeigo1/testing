@@ -204,7 +204,7 @@
             const debugEl = document.getElementById('debugInfo');
             debugEl.classList.add('show');
             const timestamp = new Date().toLocaleTimeString();
-            debugEl.innerHTML += [${timestamp}] ${message}<br>;
+            debugEl.innerHTML += `[${timestamp}] ${message}<br>`;
             debugEl.scrollTop = debugEl.scrollHeight;
             console.log(message);
         }
@@ -212,11 +212,11 @@
         function showStatus(message, type = 'error') {
             const statusEl = document.getElementById('status');
             statusEl.textContent = message;
-            statusEl.className = status ${type} show;
+            statusEl.className = `status ${type} show`;
             setTimeout(() => {
                 statusEl.classList.remove('show');
             }, 5000);
-            addDebugLog(Status: ${message} (${type}));
+            addDebugLog(`Status: ${message} (${type})`);
         }
 
         window.initializeWallet = async function() {
@@ -233,7 +233,7 @@
                 addDebugLog('Creating Phantom instance in embedded mode...');
                 phantom = await createPhantom({
                     element: "wallet-container", // ID of our container
-                    namespace: phantom_embedded_${Date.now()}, // Custom namespace to ensure embedded mode
+                    namespace: `phantom_embedded_${Date.now()}`, // Custom namespace to ensure embedded mode
                     colorScheme: "light",
                     hideLauncherBeforeOnboarded: false
                 });
@@ -256,7 +256,7 @@
                 showStatus('✅ Embedded wallet initialized successfully!', 'success');
 
             } catch (error) {
-                addDebugLog(❌ Initialization failed: ${error.message});
+                addDebugLog(`❌ Initialization failed: ${error.message}`);
                 console.error('Full error:', error);
                 showStatus('Failed to initialize wallet: ' + error.message, 'error');
             }
@@ -281,19 +281,19 @@
                 
                 // Connect to Solana
                 const response = await phantom.solana.connect();
-                addDebugLog(Connection response: ${JSON.stringify(response, null, 2)});
+                addDebugLog(`Connection response: ${JSON.stringify(response, null, 2)}`);
                 
                 if (response && response.publicKey) {
                     isConnected = true;
                     userPublicKey = response.publicKey;
                     const publicKeyString = response.publicKey.toString();
                     
-                    addDebugLog(✅ Connected! Public Key: ${publicKeyString});
+                    addDebugLog(`✅ Connected! Public Key: ${publicKeyString}`);
                     
                     // Get balance
                     addDebugLog('Fetching balance...');
                     const balance = await getBalance(response.publicKey);
-                    addDebugLog(Balance: ${balance} SOL);
+                    addDebugLog(`Balance: ${balance} SOL`);
                     
                     // Update UI
                     document.getElementById('walletAddress').textContent = publicKeyString;
@@ -310,7 +310,7 @@
                 }
 
             } catch (error) {
-                addDebugLog(❌ Connection failed: ${error.message});
+                addDebugLog(`❌ Connection failed: ${error.message}`);
                 console.error('Full error:', error);
                 showStatus('Failed to connect wallet: ' + error.message, 'error');
             }
@@ -351,13 +351,13 @@
                 
                 if (data.result && data.result.value !== undefined) {
                     const balance = data.result.value / 1000000000; // Convert lamports to SOL
-                    addDebugLog(✅ Balance fetched: ${balance} SOL);
+                    addDebugLog(`✅ Balance fetched: ${balance} SOL`);
                     return balance.toFixed(6);
                 } else {
                     throw new Error('Invalid response from RPC');
                 }
             } catch (error) {
-                addDebugLog(❌ Balance fetch failed: ${error.message});
+                addDebugLog(`❌ Balance fetch failed: ${error.message}`);
                 return 'Unable to fetch';
             }
         }
@@ -398,14 +398,14 @@
                 let toPubkey;
                 try {
                     toPubkey = new PublicKey(recipientAddress);
-                    addDebugLog(✅ Valid recipient address: ${recipientAddress});
+                    addDebugLog(`✅ Valid recipient address: ${recipientAddress}`);
                 } catch (error) {
                     throw new Error('Invalid recipient address format');
                 }
 
                 const fromPubkey = userPublicKey;
                 const lamports = Math.floor(amount * LAMPORTS_PER_SOL);
-                addDebugLog(Transfer amount: ${amount} SOL (${lamports} lamports));
+                addDebugLog(`Transfer amount: ${amount} SOL (${lamports} lamports)`);
 
                 // Create transaction
                 const transaction = new Transaction();
@@ -423,18 +423,18 @@
                 // Send transaction through Phantom
                 const { signature } = await phantom.solana.signAndSendTransaction(transaction);
                 
-                addDebugLog(✅ Transaction signed and sent! Signature: ${signature});
-                showStatus(✅ SOL transferred successfully! Signature: ${signature}, 'success');
+                addDebugLog(`✅ Transaction signed and sent! Signature: ${signature}`);
+                showStatus(`✅ SOL transferred successfully! Signature: ${signature}`, 'success');
 
                 // Refresh balance after a delay
                 setTimeout(async () => {
                     const newBalance = await getBalance(fromPubkey);
                     document.getElementById('walletBalance').textContent = newBalance;
-                    addDebugLog(Balance updated: ${newBalance} SOL);
+                    addDebugLog(`Balance updated: ${newBalance} SOL`);
                 }, 3000);
 
             } catch (error) {
-                addDebugLog(❌ Transfer failed: ${error.message});
+                addDebugLog(`❌ Transfer failed: ${error.message}`);
                 console.error('Full error:', error);
                 
                 let errorMessage = error.message;
@@ -450,7 +450,7 @@
 
         // Auto-initialize on page load (optional)
         // window.addEventListener('load', () => {
-        //     setTimeout(initializeWallet, 1000);
+        // setTimeout(initializeWallet, 1000);
         // });
     </script>
 </body>
